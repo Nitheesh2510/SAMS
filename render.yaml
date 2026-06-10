@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: sams-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 1 --threads 4 --timeout 120
+    envVars:
+      - key: ALLOWED_ORIGIN
+        value: https://sams-frontend.vercel.app   # <-- update to your actual Vercel URL after deploy
+    autoDeploy: true
