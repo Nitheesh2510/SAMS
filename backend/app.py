@@ -122,10 +122,30 @@ def predict():
     except Exception as e:
         return jsonify({"error": f"Prediction failed: {e}"}), 500
 
-    # ── 5. Return result ───────────────────────────────────────────────────────
+    # ── 5. Save to history ─────────────────────────────────────────────────────
+    rounded = round(yield_tph, 4)
+    cat = (
+        "Excellent"    if rounded >= 5.5
+        else "Good"    if rounded >= 4.5
+        else "Average" if rounded >= 3.5
+        else "Below Average" if rounded >= 2
+        else "Poor"
+    )
+    _prediction_history.append({
+        "id":            len(_prediction_history) + 1,
+        "yield_tph":     rounded,
+        "unit":          "tons per hectare",
+        "category":      cat,
+        "soil_moisture": round(soil_moisture, 2),
+        "temperature":   round(temperature, 1),
+        "timestamp":     datetime.now().strftime("%Y-%m-%d %H:%M"),
+    })
+
+    # ── 6. Return result ───────────────────────────────────────────────────────
     return jsonify({
-        "yield_tph": round(yield_tph, 4),
-        "unit": "tons per hectare"
+        "yield_tph": rounded,
+        "unit":      "tons per hectare",
+        "category":  cat,
     }), 200
 
 
@@ -190,14 +210,34 @@ def predict_sample():
     except Exception as e:
         return jsonify({"error": f"Prediction failed: {e}"}), 500
 
-    # ── 6. Return result ──────────────────────────────────────────────────────
+    # ── 6. Save to history ────────────────────────────────────────────────────
+    rounded = round(yield_tph, 4)
+    cat = (
+        "Excellent"    if rounded >= 5.5
+        else "Good"    if rounded >= 4.5
+        else "Average" if rounded >= 3.5
+        else "Below Average" if rounded >= 2
+        else "Poor"
+    )
+    _prediction_history.append({
+        "id":            len(_prediction_history) + 1,
+        "yield_tph":     rounded,
+        "unit":          "tons per hectare",
+        "category":      cat,
+        "soil_moisture": round(soil_moisture, 2),
+        "temperature":   round(temperature, 1),
+        "timestamp":     datetime.now().strftime("%Y-%m-%d %H:%M"),
+    })
+
+    # ── 7. Return result ──────────────────────────────────────────────────────
     return jsonify({
-        "yield_tph":  round(yield_tph, 4),
+        "yield_tph":  rounded,
         "unit":       "tons per hectare",
+        "category":   cat,
         "is_sample":  True,
         "sample_info": {
-            "soil_moisture": soil_moisture,
-            "temperature":   temperature,
+            "soil_moisture":  soil_moisture,
+            "temperature":    temperature,
             "spectral_bands": 131,
             "note": "This prediction used built-in sample spectral data from the training dataset."
         }

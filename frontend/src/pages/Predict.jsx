@@ -35,7 +35,12 @@ export default function Predict() {
     setLoading(true); setError(""); setResult(null); setCrops(null); setIsSample(true);
     try {
       const pred = await api.predictSample();
-      setResult(pred);
+      if (pred.error) {
+        setError(`Backend error: ${pred.error}`);
+        setResult(null);
+      } else {
+        setResult(pred);
+      }
     } catch (e) {
       setError("Sample prediction failed. Is the backend running?");
     }
@@ -47,7 +52,12 @@ export default function Predict() {
     setLoading(true); setError(""); setResult(null); setCrops(null); setIsSample(false);
     try {
       const pred = await api.predict({ spectral, soil_moisture: soilMoisture, temperature });
-      setResult(pred);
+      if (pred.error) {
+        setError(`Backend error: ${pred.error}`);
+        setResult(null);
+      } else {
+        setResult(pred);
+      }
     } catch (e) {
       setError("Prediction failed. Is the backend running?");
     }
@@ -214,7 +224,7 @@ export default function Predict() {
 
           <div style={{ color: "var(--text-muted)", fontSize: "14px", fontWeight: 600, textTransform: "uppercase", marginBottom: "8px" }}>Estimated Yield</div>
           <div style={{ color: yieldColor, fontSize: "64px", fontWeight: 700, lineHeight: 1 }}>
-            {result.yield_tph}
+            {result.yield_tph != null ? result.yield_tph : "—"}
           </div>
           <div style={{ color: "var(--text-muted)", fontSize: "16px", fontWeight: 500, marginTop: "8px", marginBottom: "20px" }}>tons per hectare</div>
 
